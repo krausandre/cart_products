@@ -49,7 +49,7 @@ class ProductViewHelper extends ActionViewHelper
             if ($product->getCategory() && $product->getCategory()->getCartProductShowPid()) {
                 $this->arguments['pluginName'] = 'Products';
                 $this->arguments['pageUid'] = $product->getCategory()->getCartProductShowPid();
-            } elseif ($this->arguments['settings']['showPageUids']) {
+            } elseif (isset($this->arguments['settings']['showPageUids'])) {
                 $this->arguments['pluginName'] = 'Products';
                 $this->arguments['pageUid'] = $this->arguments['settings']['showPageUids'];
             }

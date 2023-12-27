@@ -8,7 +8,7 @@ namespace Extcode\CartProducts\Domain\Model\Product;
  * For the full copyright and license information, please read the
  * LICENSE file that was distributed with this source code.
  */
-
+use TYPO3\CMS\Extbase\Annotation\ORM\Cascade;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
@@ -41,8 +41,8 @@ class BeVariant extends AbstractEntity
     protected $price = 0.0;
 
     /**
-     * @TYPO3\CMS\Extbase\Annotation\ORM\Cascade("remove")
-     * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Extcode\CartProducts\Domain\Model\Product\SpecialPrice>
+     * @Cascade("remove")
+     * @var ObjectStorage<SpecialPrice>
      */
     protected $specialPrices = null;
 
@@ -115,7 +115,8 @@ class BeVariant extends AbstractEntity
     {
         $price = $this->getPrice();
 
-        $parentPrice = $this->getProduct()->getPrice();
+        // $parentPrice = $this->getProduct()->getPrice(); // modified @andrekraus: does not respect special prices
+        $parentPrice = $this->getProduct()->getBestSpecialPrice();
 
         switch ($this->priceCalcMethod) {
             case 3:
@@ -128,7 +129,7 @@ class BeVariant extends AbstractEntity
                 $calc_price = 0;
         }
 
-        if ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['cart']['changeVariantDiscount']) {
+        if (isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['cart']['changeVariantDiscount'])) {
             foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['cart']['changeVariantDiscount'] as $funcRef) {
                 if ($funcRef) {
                     $params = [

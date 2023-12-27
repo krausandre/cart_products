@@ -40,9 +40,11 @@ class IfBestSpecialPriceAvailableViewHelper extends AbstractConditionViewHelper
      */
     protected static function evaluateCondition($arguments = null)
     {
+        /** @var Product */
         $product = $arguments['product'];
         $bestSpecialPrice = $product->getBestSpecialPrice(self::getFrontendUserGroupIds());
-        return $bestSpecialPrice < $product->getMinPrice();
+        // return $bestSpecialPrice < $product->getMinPrice();
+        return ($bestSpecialPrice < $product->getPrice()) || ($bestSpecialPrice < $product->getMinPrice()); // modified by @andrekraus: respect special prices
     }
 
     /**
@@ -53,7 +55,7 @@ class IfBestSpecialPriceAvailableViewHelper extends AbstractConditionViewHelper
     protected static function getFrontendUserGroupIds(): array
     {
         $feGroupIds = [];
-        $feUserId = (int)$GLOBALS['TSFE']->fe_user->user['uid'];
+        $feUserId = (int)($GLOBALS['TSFE']->fe_user->user['uid'] ?? 0);
         if ($feUserId) {
             $frontendUserRepository = GeneralUtility::makeInstance(
                 FrontendUserRepository::class
